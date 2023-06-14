@@ -14,7 +14,18 @@ function publish_post(post) {
             console.log(error)
         });
 }
-
+function like_post(post_id) {
+    fetch(`/post/${post_id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            like: true
+        })
+    })
+        .then(response => response.json())
+        .catch(error => {
+            console.log(error)
+        })
+}
 function all_posts() {
     document.getElementById('posts').style.display = 'block'
     fetch('/posts/all', {
@@ -30,11 +41,18 @@ function all_posts() {
             <div class="post-author">${post.author}</div>
             <div class="post-body">${post.body}</div>
             <div class="post-timestamp-created">${post.timestamp_created}</div>
-            <i class="bi-heart"></i> <span class="post-likes">${post.users_who_liked.length}</span>
+            <button class="like-button" data-postid="${post.id}"><i class="bi-heart"></i></button> <span class="post-likes">${post.users_who_liked.length}</span>
             `
                 post_container.innerHTML = post_html
                 const post_list = document.getElementById('posts')
                 post_list.append(post_container)
+            })
+        })
+        .then(() => {
+            document.querySelectorAll('.like-button').forEach(button => {
+                button.onclick = function () {
+                    like_post(this.dataset.postid);
+                }
             })
         })
         .catch(error => {

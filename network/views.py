@@ -90,6 +90,7 @@ def all_posts(request):
     posts = Post.objects.all().order_by('-timestamp_created')
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+@csrf_exempt
 def post(request, post_id):
     """
     Handles GET and PUT requests to get or edit the post with the id
@@ -101,3 +102,29 @@ def post(request, post_id):
         return JsonResponse({"error": "Post not found."}, status=404)
     if request.method == 'GET':
         return JsonResponse(post.serialize())
+    
+    if request.method == 'PUT':
+        if not request.user.is_authenticated:
+             return JsonResponse({'error': 'User must be authenticated to like'})
+
+        data = json.loads(request.body)
+
+        if data.get("body") is not None:
+            # User wants to update body
+            if request.user != post.author:
+                return JsonResponse({"error": "Must be the owner of the post to modify it!"})
+            post.body = data.get("body")
+            post.save()
+            return HttpResponse(status=204)
+        
+        if data.get("like") is not None:
+            try:
+                liked = post.users_who_liked.get(pk=request.user.id)
+                # if the user has liked the post already, remove them
+                post.users_who_liked.remove(liked)
+                post.save()
+            except User.DoesNotExist:
+                # if user hasn't liked it, add them to the list of likers
+                post.users_who_liked.add(request.user)
+                post.save()
+            return HttpResponse(204)
