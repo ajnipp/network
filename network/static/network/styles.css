@@ -2,3 +2,21 @@ body {
     margin-left: 10px;
     margin-right: 10px;
 }
+
+.post-container {
+    border-style: solid;
+    border-color: gray;
+    border-width: 1px;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.post-author {
+    font-weight: bold;
+    font-size: larger;
+}
+.post-timestamp-created {
+    font-weight: lighter;
+    font-size: smaller;
+}
