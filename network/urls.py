@@ -12,4 +12,5 @@ urlpatterns = [
     # API urls
     path("post", views.publish, name="publish"),
     path("post/<int:post_id>", views.post, name="post"),
+    path("posts/all", views.all_posts, name="all_posts"),
 ]

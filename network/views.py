@@ -86,6 +86,10 @@ def publish(request):
     return JsonResponse({"message": "Post created successfully."}, status=201)
 
 
+def all_posts(request):
+    posts = Post.objects.all().order_by('-timestamp_created')
+    return JsonResponse([post.serialize() for post in posts], safe=False)
+
 def post(request, post_id):
     """
     Handles GET and PUT requests to get or edit the post with the id
