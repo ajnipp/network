@@ -90,3 +90,10 @@ def post(request, post_id):
     """
     Handles GET and PUT requests to get or edit the post with the id
     """
+    # Query for requested email
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post not found."}, status=404)
+    if request.method == 'GET':
+        return JsonResponse(post.serialize())

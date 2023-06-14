@@ -8,13 +8,16 @@ https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js
 <script src="{% static 'network/index.js' %}"></script>
 {% endblock %}
 {% block body %}
-    {% if user.is_authenticated %}
-    <div id="new-post">
-        <form id="create-post-form">
-            {% csrf_token %}
-            <input id="create-post-content" type="textarea" class="form-control" rows="4"> 
-            <input type="submit" class="btn btn-primary" value="Submit">
-        </form>
-    </div> 
-    {% endif %}
+{% if user.is_authenticated %}
+<div id="new-post">
+    <form id="create-post-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="create-post-content">New Post</label>
+            <textarea class="form-control" id="create-post-content" rows="3"></textarea>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Submit">
+    </form>
+</div>
+{% endif %}
 {% endblock %}
