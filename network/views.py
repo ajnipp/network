@@ -88,7 +88,11 @@ def publish(request):
 
 def user_posts(request, username):
     page = request.GET.get('page', '1')
-    posts = Post.objects.filter(author=username).order_by('-timestamp_created')
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=404)
+    posts = Post.objects.filter(author=user).order_by('-timestamp_created')
     paginator = Paginator(posts, 10)
     out = paginator.page(page).object_list 
     return JsonResponse([post.serialize() for post in out], safe=False)
