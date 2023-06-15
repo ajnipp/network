@@ -15,6 +15,11 @@ function publish_post(post) {
         });
 }
 function like_post(post_id) {
+    if (current_username === '') {
+        // User is not logged in, so redirect them
+        alert("You must be logged in to like a post!");
+        return 
+    }
     fetch(`/post/${post_id}`, {
         method: 'PUT',
         body: JSON.stringify({

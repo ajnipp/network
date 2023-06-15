@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 from .models import User, Post
 
@@ -85,10 +86,18 @@ def publish(request):
 
     return JsonResponse({"message": "Post created successfully."}, status=201)
 
-
+def user_posts(request, username):
+    page = request.GET.get('page', '1')
+    posts = Post.objects.filter(author=username).order_by('-timestamp_created')
+    paginator = Paginator(posts, 10)
+    out = paginator.page(page).object_list 
+    return JsonResponse([post.serialize() for post in out], safe=False)
 def all_posts(request):
+    page = request.GET.get('page', '1')
     posts = Post.objects.all().order_by('-timestamp_created')
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    paginator = Paginator(posts, 10)
+    out = paginator.page(page).object_list 
+    return JsonResponse([post.serialize() for post in out], safe=False)
 
 @csrf_exempt
 def post(request, post_id):
