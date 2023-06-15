@@ -10,7 +10,7 @@
         {% block head %}{% endblock %}
     </head>
     <body>
-
+        {{ user.username|json_script:"current_username" }}
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="#">Network</a>
           

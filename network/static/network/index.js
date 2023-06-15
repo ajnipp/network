@@ -27,6 +27,9 @@ function like_post(post_id) {
             const post_container = document.querySelector(`[data-postid="${post.id}"]`)
             const like_count = post_container.querySelector('.post-likes')
             like_count.innerHTML = `${post.users_who_liked.length}`
+            const like_icon = post_container.querySelector('i')
+            like_icon.className = (post.users_who_liked.includes(current_username)) ? 'bi-heart-fill liked' : 'bi-heart'
+            console.log(post.users_who_liked)
         })
         .catch(error => {
             console.log(error)
@@ -48,7 +51,7 @@ function all_posts() {
             <div class="post-author">${post.author}</div>
             <div class="post-body">${post.body}</div>
             <div class="post-timestamp-created">${post.timestamp_created}</div>
-            <button class="like-button" data-postid="${post.id}"><i class="bi-heart"></i></button> <span class="post-likes">${post.users_who_liked.length}</span>
+            <button class="like-button" data-postid="${post.id}"><i class="${(post.users_who_liked.includes(current_username)) ? 'bi-heart-fill liked' : 'bi-heart'}"></i></button> <span class="post-likes">${post.users_who_liked.length}</span>
             `
                 post_container.innerHTML = post_html
                 const post_list = document.getElementById('posts')
@@ -68,7 +71,7 @@ function all_posts() {
 }
 function load() {
     console.log('Loaded DOM!');
-
+    current_username = JSON.parse(document.getElementById('current_username').textContent);
     // Change the submit action for the create post form
     form = document.getElementById('create-post-form')
     if (form !== null) {
