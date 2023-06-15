@@ -95,13 +95,19 @@ def user_posts(request, username):
     posts = Post.objects.filter(author=user).order_by('-timestamp_created')
     paginator = Paginator(posts, 10)
     out = paginator.page(page).object_list 
-    return JsonResponse([post.serialize() for post in out], safe=False)
+    return JsonResponse({"posts" : [post.serialize() for post in out],
+                        "current_page": page,
+                        "num_pages" : paginator.num_pages},
+                        safe=False)
 def all_posts(request):
     page = request.GET.get('page', '1')
     posts = Post.objects.all().order_by('-timestamp_created')
     paginator = Paginator(posts, 10)
     out = paginator.page(page).object_list 
-    return JsonResponse([post.serialize() for post in out], safe=False)
+    return JsonResponse({"posts" : [post.serialize() for post in out],
+                        "current_page": page,
+                        "num_pages" : paginator.num_pages},
+                        safe=False)
 
 @csrf_exempt
 def post(request, post_id):

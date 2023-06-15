@@ -18,7 +18,7 @@ function like_post(post_id) {
     if (current_username === '') {
         // User is not logged in, so redirect them
         alert("You must be logged in to like a post!");
-        return 
+        return
     }
     fetch(`/post/${post_id}`, {
         method: 'PUT',
@@ -42,12 +42,17 @@ function like_post(post_id) {
 }
 function all_posts() {
     document.getElementById('posts').style.display = 'block'
-    fetch('/posts/all', {
+    fetch('/posts/all?' + new URLSearchParams({
+        page: current_page,
+    }), {
         method: 'GET'
     })
         .then(response => response.json())
-        .then(posts => {
-            posts.forEach(post => {
+        .then(response => {
+            console.log(response)
+            const post_list = document.getElementById('posts')
+            post_list.innerHTML = ''
+            response.posts.forEach(post => {
                 const post_container = document.createElement('div')
                 post_container.className = 'post-container'
                 post_container.setAttribute('data-postid', post.id)
@@ -59,9 +64,46 @@ function all_posts() {
             <button class="like-button" data-postid="${post.id}"><i class="${(post.users_who_liked.includes(current_username)) ? 'bi-heart-fill liked' : 'bi-heart'}"></i></button> <span class="post-likes">${post.users_who_liked.length}</span>
             `
                 post_container.innerHTML = post_html
-                const post_list = document.getElementById('posts')
                 post_list.append(post_container)
             })
+            
+            // Handle Page navigation 
+            const page_nav = document.getElementById('page-navigation')
+            // Clear previous page indices
+            page_nav.querySelectorAll('.page-index').forEach( element => {
+                element.remove()
+            })
+            if (parseInt(response.num_pages) > 1) {
+                // Show the page navigator 
+                document.getElementById('page-navigation').style.display = 'block'
+                document.getElementById('next-page').onclick = function () {
+                    if (current_page < response.num_pages) {
+                        current_page++;
+                    }
+                    all_posts();
+                }
+                document.getElementById('previous-page').onclick = function () {
+                    if (current_page > 1) {
+                        current_page--;
+                    }
+                    all_posts();
+                }
+                const paginator = document.querySelector('.pagination')
+                const next_page = paginator.querySelector('#next-page')
+
+                for (let i = 1; i <= response.num_pages; i++) {
+                    const page = document.createElement('li')
+                    page.classList.add('page-item', 'page-index')
+                    page.innerHTML = `<a class="page-link" href="#">${i}</a>`
+                    page.onclick = function () {
+                        current_page = i
+                        all_posts()
+                    }
+                    next_page.insertAdjacentElement('beforebegin', page)
+                }
+            } else {
+                document.getElementById('page-navigation').style.display = 'none'
+            }
         })
         .then(() => {
             document.querySelectorAll('.like-button').forEach(button => {
@@ -75,6 +117,7 @@ function all_posts() {
         })
 }
 function load() {
+    current_page = 1
     console.log('Loaded DOM!');
     current_username = JSON.parse(document.getElementById('current_username').textContent);
     // Change the submit action for the create post form
