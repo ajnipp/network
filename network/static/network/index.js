@@ -22,6 +22,12 @@ function like_post(post_id) {
         })
     })
         .then(response => response.json())
+        .then(post => {
+            // Update the post's likes
+            const post_container = document.querySelector(`[data-postid="${post.id}"]`)
+            const like_count = post_container.querySelector('.post-likes')
+            like_count.innerHTML = `${post.users_who_liked.length}`
+        })
         .catch(error => {
             console.log(error)
         })
@@ -36,6 +42,7 @@ function all_posts() {
             posts.forEach(post => {
                 const post_container = document.createElement('div')
                 post_container.className = 'post-container'
+                post_container.setAttribute('data-postid', post.id)
                 const post_html =
                     `
             <div class="post-author">${post.author}</div>

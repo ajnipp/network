@@ -93,7 +93,8 @@ def all_posts(request):
 @csrf_exempt
 def post(request, post_id):
     """
-    Handles GET and PUT requests to get or edit the post with the id
+    Handles GET and PUT requests to get or edit the post with the id. When successful,
+    both return the current post in JSON form.
     """
     # Query for requested post
     try:
@@ -115,7 +116,7 @@ def post(request, post_id):
                 return JsonResponse({"error": "Must be the owner of the post to modify it!"})
             post.body = data.get("body")
             post.save()
-            return HttpResponse(status=204)
+            return JsonResponse(post.serialize(), safe=True)
         
         if data.get("like") is not None:
             try:
@@ -127,4 +128,4 @@ def post(request, post_id):
                 # if user hasn't liked it, add them to the list of likers
                 post.users_who_liked.add(request.user)
                 post.save()
-            return HttpResponse(204)
+            return JsonResponse(post.serialize(), safe=True)
