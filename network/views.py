@@ -95,7 +95,7 @@ def post(request, post_id):
     """
     Handles GET and PUT requests to get or edit the post with the id
     """
-    # Query for requested email
+    # Query for requested post
     try:
         post = Post.objects.get(pk=post_id)
     except Post.DoesNotExist:
