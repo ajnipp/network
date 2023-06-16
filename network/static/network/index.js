@@ -1,5 +1,5 @@
+csrftoken = Cookies.get('csrftoken');
 function publish_post(post) {
-    const csrftoken = Cookies.get('csrftoken');
     fetch('/post', {
         method: 'POST',
         headers: { 'X-CSRFToken': csrftoken },
@@ -22,6 +22,8 @@ function like_post(post_id) {
     }
     fetch(`/post/${post_id}`, {
         method: 'PUT',
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin', // Do not send CSRF token to another domain.
         body: JSON.stringify({
             like: true
         })
@@ -65,20 +67,67 @@ function link_user_pages() {
     })
 }
 
-function show_user_details(username) {
+function update_follow_button(user_data) {
+    follow_button = document.querySelector('#follow-button') 
+        if (user_data.followers.includes(current_username)) {
+            follow_button.innerHTML = "Unfollow"
+        } else {
+            follow_button.innerHTML = "Follow"
+        }
     
 }
 
+function follow_user(username) {
+    fetch(`user/${username}`, {
+        method: 'PUT',
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin', // Do not send CSRF token to another domain.
+        body: JSON.stringify({
+            'follow': username 
+        })
+    })
+    .then(response => response.json())
+    .then(response => {
+        update_user_details(response)
+    })
+} 
+
+function update_user_details(user_data) {
+    const follower_count = document.getElementById('follower-count') 
+    const following_count = document.getElementById('following-count') 
+    follower_count.innerHTML = user_data.followers.length
+    following_count.innerHTML = user_data.following.length
+    update_follow_button(user_data)
+}
+
+function fetch_user_details(username) {
+    fetch(`user/${username}`, {
+        method: 'GET',
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin', // Do not send CSRF token to another domain.
+    })
+    .then(response => response.json())
+    .then(response => {
+        update_user_details(response)
+    }) 
+} 
 function user_page(username) {
     document.querySelectorAll('.section').forEach(section => {
         section.style.display = 'none'
     })
     document.getElementById('posts').style.display = 'block'
+    document.getElementById('profile-details').style.display = 'block'
     document.getElementById('page-header').innerHTML = username 
+    fetch_user_details(username)
+    document.getElementById('follow-button').onclick = function() {
+        follow_user(username)
+    }
     fetch(`/posts/user/${username}?` + new URLSearchParams({
         page: current_page,
     }), {
-        method: 'GET'
+        method: 'GET',
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin', // Do not send CSRF token to another domain.
     })
         .then(response => response.json())
         .then(response => {
@@ -150,7 +199,9 @@ function all_posts() {
     fetch('/posts/all?' + new URLSearchParams({
         page: current_page,
     }), {
-        method: 'GET'
+        method: 'GET',
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin', // Do not send CSRF token to another domain.
     })
         .then(response => response.json())
         .then(response => {

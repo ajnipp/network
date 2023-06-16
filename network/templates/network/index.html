@@ -8,6 +8,7 @@ https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js
 <script src="{% static 'network/index.js' %}"></script>
 {% endblock %}
 {% block body %}
+{% csrf_token %}
 <h2 id="page-header">All Posts</h2>
 <div id="profile-details" class="section">
     <span id="follower-count"></span>
@@ -17,7 +18,6 @@ https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js
 {% if user.is_authenticated %}
 <div id="new-post" class="section">
     <form id="create-post-form">
-        {% csrf_token %}
         <div class="form-group">
             <label for="create-post-content">New Post</label>
             <textarea class="form-control" id="create-post-content" rows="3"></textarea>

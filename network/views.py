@@ -148,7 +148,7 @@ def post(request, post_id):
                 post.users_who_liked.add(request.user)
                 post.save()
             return JsonResponse(post.serialize(), safe=True)
-
+@login_required
 def user(request, username):
     """
     Handles GET and PUT requests to get or edit the user with the username. When successful,
@@ -165,7 +165,6 @@ def user(request, username):
     if request.method == 'PUT':
         if not request.user.is_authenticated:
              return JsonResponse({'error': 'User must be authenticated to change user info'})
-
         data = json.loads(request.body)
 
         if data.get("follow") is not None:
