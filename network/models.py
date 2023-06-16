@@ -6,6 +6,13 @@ class User(AbstractUser):
     id = models.AutoField(primary_key=True)
     following = models.ManyToManyField('self', symmetrical=False, related_name='followers')
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "following": [user.username for user in self.following.all()],
+            "followers": [user.username for user in self.followers.all()],
+        }
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
     timestamp_created = models.DateTimeField(auto_now_add=True)

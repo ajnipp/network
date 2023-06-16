@@ -148,3 +148,34 @@ def post(request, post_id):
                 post.users_who_liked.add(request.user)
                 post.save()
             return JsonResponse(post.serialize(), safe=True)
+
+def user(request, username):
+    """
+    Handles GET and PUT requests to get or edit the user with the username. When successful,
+    both return the current post in JSON form.
+    """
+    # Query for requested post
+    try:
+        queried_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=404)
+    if request.method == 'GET':
+        return JsonResponse(queried_user.serialize())
+    
+    if request.method == 'PUT':
+        if not request.user.is_authenticated:
+             return JsonResponse({'error': 'User must be authenticated to change user info'})
+
+        data = json.loads(request.body)
+
+        if data.get("follow") is not None:
+            try:
+                queried_user.followers.get(pk=request.user.id)
+                # if the user has followed, remove them
+                queried_user.followers.remove(request.user)
+                queried_user.save()
+            except User.DoesNotExist:
+                # if user hasn't followed, follow
+                queried_user.followers.add(request.user)
+                queried_user.save()
+            return JsonResponse(queried_user.serialize(), safe=True)
