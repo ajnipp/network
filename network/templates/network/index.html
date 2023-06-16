@@ -8,8 +8,14 @@ https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js
 <script src="{% static 'network/index.js' %}"></script>
 {% endblock %}
 {% block body %}
+<h2 id="page-header">All Posts</h2>
+<div id="profile-details" class="section">
+    <span id="follower-count"></span>
+    <span id="following-count"></span>
+    <button id="follow-button" class="btn btn-primary">Follow</button>
+</div>
 {% if user.is_authenticated %}
-<div id="new-post">
+<div id="new-post" class="section">
     <form id="create-post-form">
         {% csrf_token %}
         <div class="form-group">
@@ -20,14 +26,14 @@ https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js
     </form>
 </div>
 {% endif %}
-<div id="posts">
+<div id="posts" class="section">
 
 </div>
 
-<nav id="page-navigation" aria-label="Page navigation">
+<nav id="page-navigation" class="section" aria-label="Page navigation">
     <ul class="pagination">
-      <li id="previous-page" class="page-item"><a class="page-link" href="#">Previous</a></li>
-      <li id="next-page" class="page-item"><a class="page-link" href="#">Next</a></li>
+        <li id="previous-page" class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li id="next-page" class="page-item"><a class="page-link" href="#">Next</a></li>
     </ul>
-  </nav>
+</nav>
 {% endblock %}

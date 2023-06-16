@@ -40,8 +40,31 @@ function like_post(post_id) {
             console.log(error)
         })
 }
+
+function user_posts(username) {
+
+}
+
+function display_post(post, post_list) {
+    const post_container = document.createElement('div')
+    post_container.className = 'post-container'
+    post_container.setAttribute('data-postid', post.id)
+    const post_html =
+        `
+            <div class="post-author">${post.author}</div>
+            <div class="post-body">${post.body}</div>
+            <div class="post-timestamp-created">${post.timestamp_created}</div>
+            <button class="like-button" data-postid="${post.id}"><i class="${(post.users_who_liked.includes(current_username)) ? 'bi-heart-fill liked' : 'bi-heart'}"></i></button> <span class="post-likes">${post.users_who_liked.length}</span>
+            `
+    post_container.innerHTML = post_html
+    post_list.append(post_container)
+}
 function all_posts() {
+    document.querySelectorAll('.section').forEach(section => {
+        section.style.display = 'none'
+    })
     document.getElementById('posts').style.display = 'block'
+    document.getElementById('page-header').innerHTML = 'All Posts'
     fetch('/posts/all?' + new URLSearchParams({
         page: current_page,
     }), {
@@ -53,24 +76,13 @@ function all_posts() {
             const post_list = document.getElementById('posts')
             post_list.innerHTML = ''
             response.posts.forEach(post => {
-                const post_container = document.createElement('div')
-                post_container.className = 'post-container'
-                post_container.setAttribute('data-postid', post.id)
-                const post_html =
-                    `
-            <div class="post-author">${post.author}</div>
-            <div class="post-body">${post.body}</div>
-            <div class="post-timestamp-created">${post.timestamp_created}</div>
-            <button class="like-button" data-postid="${post.id}"><i class="${(post.users_who_liked.includes(current_username)) ? 'bi-heart-fill liked' : 'bi-heart'}"></i></button> <span class="post-likes">${post.users_who_liked.length}</span>
-            `
-                post_container.innerHTML = post_html
-                post_list.append(post_container)
+                display_post(post, post_list);
             })
-            
+
             // Handle Page navigation 
             const page_nav = document.getElementById('page-navigation')
             // Clear previous page indices
-            page_nav.querySelectorAll('.page-index').forEach( element => {
+            page_nav.querySelectorAll('.page-index').forEach(element => {
                 element.remove()
             })
             if (parseInt(response.num_pages) > 1) {

@@ -96,7 +96,7 @@ def user_posts(request, username):
     paginator = Paginator(posts, 10)
     out = paginator.page(page).object_list 
     return JsonResponse({"posts" : [post.serialize() for post in out],
-                        "current_page": page,
+                        "current_page": int(page),
                         "num_pages" : paginator.num_pages},
                         safe=False)
 def all_posts(request):
