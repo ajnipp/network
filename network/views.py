@@ -151,6 +151,23 @@ def post(request, post_id):
             return JsonResponse(post.serialize(), safe=True)
 
 @login_required
+def following_posts(request):
+    username = request.user.username
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Request to following feed must be a GET'})
+    try:
+        posts = util.get_all_following_posts(username)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found."}, status=404)
+    page = request.GET.get('page', '1') 
+    paginator = Paginator(posts, 10)
+    out = paginator.page(page).object_list 
+    return JsonResponse({"posts" : [post.serialize() for post in out],
+                        "current_page": page,
+                        "num_pages" : paginator.num_pages},
+                        safe=False) 
+
+@login_required
 def user(request, username):
     """
     Handles GET and PUT requests to get or edit the user with the username. When successful,

@@ -112,6 +112,12 @@ function fetch_user_details(username) {
         update_user_details(response)
     }) 
 } 
+function show_new_post() {
+    new_post = document.getElementById('new-post')
+    if (new_post !== null) {
+        new_post.style.display = 'block'
+    }
+}
 function user_page(username) {
     document.querySelectorAll('.section').forEach(section => {
         section.style.display = 'none'
@@ -190,11 +196,11 @@ function user_page(username) {
             console.log(error)
         }) 
 }
-
 function all_posts() {
     document.querySelectorAll('.section').forEach(section => {
         section.style.display = 'none'
     })
+    show_new_post()
     document.getElementById('posts').style.display = 'block'
     document.getElementById('page-header').innerHTML = 'All Posts'
     fetch('/posts/all?' + new URLSearchParams({
