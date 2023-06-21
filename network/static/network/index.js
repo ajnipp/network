@@ -59,23 +59,23 @@ function display_post(post, post_list) {
 }
 
 function link_user_pages() {
-    document.querySelectorAll('.username-link').forEach( element => {
+    document.querySelectorAll('.username-link').forEach(element => {
         const linked_user = element.innerHTML
         element.style.cursor = "pointer"
-        element.onclick = function() {
+        element.onclick = function () {
             user_page(linked_user)
         }
     })
 }
 
 function update_follow_button(user_data) {
-    follow_button = document.querySelector('#follow-button') 
-        if (user_data.followers.includes(current_username)) {
-            follow_button.innerHTML = "Unfollow"
-        } else {
-            follow_button.innerHTML = "Follow"
-        }
-    
+    follow_button = document.querySelector('#follow-button')
+    if (user_data.followers.includes(current_username)) {
+        follow_button.innerHTML = "Unfollow"
+    } else {
+        follow_button.innerHTML = "Follow"
+    }
+
 }
 
 function follow_user(username) {
@@ -84,18 +84,18 @@ function follow_user(username) {
         headers: { 'X-CSRFToken': csrftoken },
         mode: 'same-origin', // Do not send CSRF token to another domain.
         body: JSON.stringify({
-            'follow': username 
+            'follow': username
         })
     })
-    .then(response => response.json())
-    .then(response => {
-        update_user_details(response)
-    })
-} 
+        .then(response => response.json())
+        .then(response => {
+            update_user_details(response)
+        })
+}
 
 function update_user_details(user_data) {
-    const follower_count = document.getElementById('follower-count') 
-    const following_count = document.getElementById('following-count') 
+    const follower_count = document.getElementById('follower-count')
+    const following_count = document.getElementById('following-count')
     follower_count.innerHTML = `${user_data.followers.length} followers`
     following_count.innerHTML = `${user_data.following.length} following`
     update_follow_button(user_data)
@@ -107,27 +107,33 @@ function fetch_user_details(username) {
         headers: { 'X-CSRFToken': csrftoken },
         mode: 'same-origin', // Do not send CSRF token to another domain.
     })
-    .then(response => response.json())
-    .then(response => {
-        update_user_details(response)
-    }) 
-} 
+        .then(response => response.json())
+        .then(response => {
+            update_user_details(response)
+        })
+}
 function show_new_post() {
     new_post = document.getElementById('new-post')
     if (new_post !== null) {
         new_post.style.display = 'block'
     }
 }
+
 function user_page(username) {
     document.querySelectorAll('.section').forEach(section => {
         section.style.display = 'none'
     })
     document.getElementById('posts').style.display = 'block'
     document.getElementById('profile-details').style.display = 'block'
-    document.getElementById('page-header').innerHTML = username 
+    document.getElementById('page-header').innerHTML = username
     fetch_user_details(username)
-    document.getElementById('follow-button').onclick = function() {
-        follow_user(username)
+    const follow_button = document.getElementById('follow-button')
+    if (username === current_username) {
+        follow_button.style.display = 'none'
+    } else {
+        follow_button.onclick = function () {
+            follow_user(username)
+        }
     }
     fetch(`/posts/user/${username}?` + new URLSearchParams({
         page: current_page,
@@ -194,7 +200,7 @@ function user_page(username) {
         })
         .catch(error => {
             console.log(error)
-        }) 
+        })
 }
 
 function following_page() {
@@ -202,7 +208,7 @@ function following_page() {
         section.style.display = 'none'
     })
     document.getElementById('posts').style.display = 'block'
-    document.getElementById('page-header').innerHTML = 'Following' 
+    document.getElementById('page-header').innerHTML = 'Following'
     fetch(`/following?` + new URLSearchParams({
         page: current_page,
     }), {
@@ -234,13 +240,13 @@ function following_page() {
                     if (current_page < response.num_pages) {
                         current_page++;
                     }
-                    following_page() 
+                    following_page()
                 }
                 document.getElementById('previous-page').onclick = function () {
                     if (current_page > 1) {
                         current_page--;
                     }
-                    following_page() 
+                    following_page()
                 }
                 const paginator = document.querySelector('.pagination')
                 const next_page = paginator.querySelector('#next-page')
@@ -268,7 +274,7 @@ function following_page() {
         })
         .catch(error => {
             console.log(error)
-        }) 
+        })
 }
 
 function all_posts() {
@@ -348,7 +354,7 @@ function all_posts() {
 
 function set_nav_bar_links() {
     const following_link = document.getElementById('following-link')
-    following_link.onclick = function() {
+    following_link.onclick = function () {
         following_page()
     }
 }
@@ -367,7 +373,7 @@ function load() {
             publish_post(post)
         }
     }
-    set_nav_bar_links() 
+    set_nav_bar_links()
     all_posts();
 }
 

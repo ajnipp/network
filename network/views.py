@@ -187,6 +187,8 @@ def user(request, username):
         data = json.loads(request.body)
 
         if data.get("follow") is not None:
+            if request.user.id == queried_user.id:
+                return JsonResponse({'error': 'Cannot follow self!'})
             try:
                 queried_user.followers.get(pk=request.user.id)
                 # if the user has followed, remove them
