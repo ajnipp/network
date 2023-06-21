@@ -11,6 +11,8 @@ from django.core.paginator import Paginator
 from .models import User, Post
 
 
+from . import util 
+
 def index(request):
     return render(request, "network/index.html")
 
@@ -89,10 +91,9 @@ def publish(request):
 def user_posts(request, username):
     page = request.GET.get('page', '1')
     try:
-        user = User.objects.get(username=username)
+        posts = util.get_all_user_posts(username)
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found."}, status=404)
-    posts = Post.objects.filter(author=user).order_by('-timestamp_created')
     paginator = Paginator(posts, 10)
     out = paginator.page(page).object_list 
     return JsonResponse({"posts" : [post.serialize() for post in out],
@@ -148,6 +149,7 @@ def post(request, post_id):
                 post.users_who_liked.add(request.user)
                 post.save()
             return JsonResponse(post.serialize(), safe=True)
+
 @login_required
 def user(request, username):
     """
