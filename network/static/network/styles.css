@@ -35,3 +35,8 @@ nav {
 .liked {
     color: red;
 }
+
+#follow-details-container {
+    font-weight: bold;
+    padding-bottom: 10px;
+}

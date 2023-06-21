@@ -61,6 +61,7 @@ function display_post(post, post_list) {
 function link_user_pages() {
     document.querySelectorAll('.username-link').forEach( element => {
         const linked_user = element.innerHTML
+        element.style.cursor = "pointer"
         element.onclick = function() {
             user_page(linked_user)
         }
@@ -95,8 +96,8 @@ function follow_user(username) {
 function update_user_details(user_data) {
     const follower_count = document.getElementById('follower-count') 
     const following_count = document.getElementById('following-count') 
-    follower_count.innerHTML = user_data.followers.length
-    following_count.innerHTML = user_data.following.length
+    follower_count.innerHTML = `${user_data.followers.length} followers`
+    following_count.innerHTML = `${user_data.following.length} following`
     update_follow_button(user_data)
 }
 

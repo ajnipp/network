@@ -11,8 +11,10 @@ https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js
 {% csrf_token %}
 <h2 id="page-header">All Posts</h2>
 <div id="profile-details" class="section">
-    <span id="follower-count"></span>
-    <span id="following-count"></span>
+    <div id="follow-details-container" class="pb-2">
+        <span id="follower-count" class="pr-3"></span>
+        <span id="following-count" ></span>
+    </div>
     <button id="follow-button" class="btn btn-primary">Follow</button>
 </div>
 {% if user.is_authenticated %}
