@@ -196,6 +196,81 @@ function user_page(username) {
             console.log(error)
         }) 
 }
+
+function following_page() {
+    document.querySelectorAll('.section').forEach(section => {
+        section.style.display = 'none'
+    })
+    document.getElementById('posts').style.display = 'block'
+    document.getElementById('page-header').innerHTML = 'Following' 
+    fetch(`/following?` + new URLSearchParams({
+        page: current_page,
+    }), {
+        method: 'GET',
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin', // Do not send CSRF token to another domain.
+    })
+        .then(response => response.json())
+        .then(response => {
+            console.log(response)
+            const post_list = document.getElementById('posts')
+            post_list.innerHTML = ''
+            response.posts.forEach(post => {
+                display_post(post, post_list);
+            })
+            // Make username links clickable
+            link_user_pages();
+
+            // Handle Page navigation 
+            const page_nav = document.getElementById('page-navigation')
+            // Clear previous page indices
+            page_nav.querySelectorAll('.page-index').forEach(element => {
+                element.remove()
+            })
+            if (parseInt(response.num_pages) > 1) {
+                // Show the page navigator 
+                document.getElementById('page-navigation').style.display = 'block'
+                document.getElementById('next-page').onclick = function () {
+                    if (current_page < response.num_pages) {
+                        current_page++;
+                    }
+                    following_page() 
+                }
+                document.getElementById('previous-page').onclick = function () {
+                    if (current_page > 1) {
+                        current_page--;
+                    }
+                    following_page() 
+                }
+                const paginator = document.querySelector('.pagination')
+                const next_page = paginator.querySelector('#next-page')
+
+                for (let i = 1; i <= response.num_pages; i++) {
+                    const page = document.createElement('li')
+                    page.classList.add('page-item', 'page-index')
+                    page.innerHTML = `<a class="page-link" href="#">${i}</a>`
+                    page.onclick = function () {
+                        current_page = i
+                        following_page()
+                    }
+                    next_page.insertAdjacentElement('beforebegin', page)
+                }
+            } else {
+                document.getElementById('page-navigation').style.display = 'none'
+            }
+        })
+        .then(() => {
+            document.querySelectorAll('.like-button').forEach(button => {
+                button.onclick = function () {
+                    like_post(this.dataset.postid);
+                }
+            })
+        })
+        .catch(error => {
+            console.log(error)
+        }) 
+}
+
 function all_posts() {
     document.querySelectorAll('.section').forEach(section => {
         section.style.display = 'none'
@@ -270,6 +345,13 @@ function all_posts() {
             console.log(error)
         })
 }
+
+function set_nav_bar_links() {
+    const following_link = document.getElementById('following-link')
+    following_link.onclick = function() {
+        following_page()
+    }
+}
 function load() {
     current_page = 1
     console.log('Loaded DOM!');
@@ -285,6 +367,7 @@ function load() {
             publish_post(post)
         }
     }
+    set_nav_bar_links() 
     all_posts();
 }
 
