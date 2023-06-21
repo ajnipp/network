@@ -44,12 +44,13 @@ function like_post(post_id) {
 }
 
 function submit_edit(post_id, edited_content) {
+    console.log('submittin!')
     fetch(`/post/${post_id}`, {
         method: 'PUT',
         headers: { 'X-CSRFToken': csrftoken },
         mode: 'same-origin', // Do not send CSRF token to another domain.
         body: JSON.stringify({
-            edit: edited_content
+            body: edited_content
         })
     })
         .then(response => response.json())
@@ -83,8 +84,9 @@ function edit_post(post_id) {
     `
     const edit_form = document.getElementById('edit-post-form')
     edit_form.onsubmit = function () {
-        const edited_body = edit_form.getElementById('edit-post-content').value
+        const edited_body = document.getElementById('edit-post-form').querySelector('#edit-post-content').value
         submit_edit(post_id, edited_body)
+        return false
     }
 
 }

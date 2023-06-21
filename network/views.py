@@ -129,6 +129,7 @@ def post(request, post_id):
              return JsonResponse({'error': 'User must be authenticated to like'})
 
         data = json.loads(request.body)
+        print(data)
 
         if data.get("body") is not None:
             # User wants to update body
