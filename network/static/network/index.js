@@ -43,6 +43,51 @@ function like_post(post_id) {
         })
 }
 
+function submit_edit(post_id, edited_content) {
+    fetch(`/post/${post_id}`, {
+        method: 'PUT',
+        headers: { 'X-CSRFToken': csrftoken },
+        mode: 'same-origin', // Do not send CSRF token to another domain.
+        body: JSON.stringify({
+            edit: edited_content
+        })
+    })
+        .then(response => response.json())
+        .then(post => {
+            // Update the post's body 
+            const post_container = document.querySelector(`[data-postid="${post.id}"]`)
+            const edit_button = post_container.querySelector('.edit-button')
+            edit_button.classList.replace('d-none', 'd-block')
+            const post_body = post_container.querySelector('.post-body')
+            post_body.innerHTML = post.body
+        })
+        .catch(error => {
+            console.log(error)
+        })
+}
+
+function edit_post(post_id) {
+    const post_container = document.querySelector(`[data-postid="${post_id}"]`)
+    const edit_button = post_container.querySelector('.edit-button')
+    edit_button.classList.replace('d-block', 'd-none')
+    const post_body = post_container.querySelector('.post-body')
+    const previous_body = post_body.innerHTML
+    post_body.innerHTML =
+        `
+    <form id="edit-post-form">
+        <div class="form-group">
+            <textarea class="form-control" id="edit-post-content" rows="3">${previous_body}</textarea>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Submit">
+    </form>
+    `
+    const edit_form = document.getElementById('edit-post-form')
+    edit_form.onsubmit = function () {
+        const edited_body = edit_form.getElementById('edit-post-content').value
+        submit_edit(post_id, edited_body)
+    }
+
+}
 function display_post(post, post_list) {
     const post_container = document.createElement('div')
     post_container.className = 'post-container'
@@ -51,10 +96,15 @@ function display_post(post, post_list) {
         `
             <div class="post-author username-link">${post.author}</div>
             <div class="post-body">${post.body}</div>
+            <a class="edit-button ${post.author === current_username ? 'd-block' : 'd-none'}">Edit</a>
             <div class="post-timestamp-created">${post.timestamp_created}</div>
             <button class="like-button" data-postid="${post.id}"><i class="${(post.users_who_liked.includes(current_username)) ? 'bi-heart-fill liked' : 'bi-heart'}"></i></button> <span class="post-likes">${post.users_who_liked.length}</span>
             `
     post_container.innerHTML = post_html
+    const edit_button = post_container.querySelector('.edit-button')
+    edit_button.onclick = function () {
+        edit_post(post.id)
+    }
     post_list.append(post_container)
 }
 
@@ -362,9 +412,10 @@ function load() {
     current_page = 1
     console.log('Loaded DOM!');
     current_username = JSON.parse(document.getElementById('current_username').textContent);
-    // Change the submit action for the create post form
-    form = document.getElementById('create-post-form')
-    if (form !== null) {
+    user_logged_in = (current_username !== '')
+    if (user_logged_in) {
+        set_nav_bar_links()
+        form = document.getElementById('create-post-form')
         document.getElementById('create-post-form').onsubmit = function () {
             const body = document.getElementById('create-post-content').value;
             post = {
@@ -373,7 +424,6 @@ function load() {
             publish_post(post)
         }
     }
-    set_nav_bar_links()
     all_posts();
 }
 
